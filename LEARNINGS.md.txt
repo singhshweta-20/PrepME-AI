@@ -1,0 +1,12 @@
+# What I Learned
+
+## React
+- Components are reusable UI blocks
+- useState handles dynamic data
+
+## Backend
+- Express creates APIs
+- Routes handle requests
+
+## Axios
+- Frontend communicates with backend

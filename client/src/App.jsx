@@ -1,27 +1,58 @@
-import { useState } from "react"
-import Navbar from "./components/Navbar"
-import UserCard from "./components/UserCard"
+import { useEffect, useState } from "react"
+import axios from "axios"
 
 function App() {
-  // const [count, setCount] = useState(0)
+  const [message, setMessage] = useState("")
+
+  // useEffect(() => {
+  //   axios
+  //     .get("http://localhost:5000/api/message")
+  //     .then((response) => {
+  //       setMessage(response.data.message)
+  //     })
+  //     .catch((error) => {
+  //       console.log(error)
+  //     })
+  // }, [])
+
+
+
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
 
-  function handleSubmit(event) {
+  async function handleLogin(event) {
     event.preventDefault()
 
-    console.log("Email:", email)
-    console.log("Password:", password)
+    try {
+      const response = await axios.post(
+        "http://localhost:5000/api/login",
+        {
+          email,
+          password
+        }
+      )
+
+      // console.log(response.data.message)
+      setMessage(response.data.message)
+
+
+    } catch (error) {
+      console.log(error)
+    }
   }
 
-
-
   return (
-    // Form
-     <div>
+    // <div>
+    //   <h1>Frontend + Backend Connection</h1>
+
+    //   <h2>{message}</h2>
+    // </div>
+
+
+    <div>
       <h1>Login Form</h1>
 
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={handleLogin}>
         <input
           type="email"
           placeholder="Enter email"
@@ -44,29 +75,10 @@ function App() {
           Login
         </button>
       </form>
+
+      <h2>{message}</h2>
+
     </div>
-
-
-
-    // <div>
-
-    //   <Navbar/>
-    //   <h1>Counter: {count}</h1>
-
-    //   <button onClick={() => setCount(count + 1)}>
-    //     Increase
-    //   </button>
-    // </div>
-
-
-
-    // UseCard
-    // <div>
-    //   <UserCard name="Shweta" role="Developer" />
-
-    //   <UserCard name="Rahul" role="Designer" />
-    // </div>
-    
   )
 }
 

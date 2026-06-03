@@ -25,7 +25,7 @@ function App() {
 
     try {
       const response = await axios.post(
-        "http://localhost:5000/api/login",
+        "http://localhost:5000/api/users/signup",
         {
           email,
           password
@@ -37,7 +37,8 @@ function App() {
 
 
     } catch (error) {
-      console.log(error)
+      console.log(error.response.data.message)
+      setMessage(error.response.data.message)
     }
   }
 

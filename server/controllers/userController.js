@@ -3,6 +3,7 @@
 
 const User = require("../models/User")
 const bcrypt = require("bcrypt")
+const jwt = require("jsonwebtoken")
 
 const signupUser = async (req, res) => {
 
@@ -77,8 +78,19 @@ const loginUser = async (req, res) => {
 
     }
 
+    const token = jwt.sign({
+        userId: user._id,
+        email: user.email
+      },
+      process.env.JWT_SECRET,
+      {
+        expiresIn: "1h"
+      }
+    )
+
     res.json({
-      message: "Login successful"
+      message: "Login successful",
+      token
     })
 
   } catch (error) {
@@ -93,7 +105,18 @@ const loginUser = async (req, res) => {
 
 }
 
+const getProfile =
+  async (req, res) => {
+
+    res.json({
+      message: "Protected route accessed",
+      user: req.user
+    })
+
+}
+
 module.exports = {
   signupUser,
-  loginUser
+  loginUser,
+  getProfile
 }

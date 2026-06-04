@@ -19,8 +19,9 @@ function App() {
 
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
+  const [profile, setProfile] = useState(null)
 
-  async function handleLogin(event) {
+  async function handleSignup(event) {
     event.preventDefault()
 
     try {
@@ -42,6 +43,58 @@ function App() {
     }
   }
 
+  async function handleLogin(event) {
+    event.preventDefault()
+
+    try {
+      const response = await axios.post(
+        "http://localhost:5000/api/users/login",
+        {
+          email,
+          password
+        }
+      )
+
+      localStorage.setItem(
+        "token",
+        response.data.token
+      )
+
+      setMessage(response.data.message)
+
+
+    } catch (error) {
+      console.log(error.response.data.message)
+      setMessage(error.response.data.message)
+    }
+  }
+
+  async function getProfile() {
+
+    try {
+
+      const token =
+        localStorage.getItem("token")
+
+      const response =
+        await axios.get(
+          "http://localhost:5000/api/users/profile",
+          {
+            headers: {
+              Authorization: token
+            }
+          }
+        )
+
+      setProfile(response.data)
+
+    } catch (error) {
+
+      console.log(error)
+
+    }
+  }
+
   return (
     // <div>
     //   <h1>Frontend + Backend Connection</h1>
@@ -53,7 +106,7 @@ function App() {
     <div>
       <h1>Login Form</h1>
 
-      <form onSubmit={handleLogin}>
+      <form>
         <input
           type="email"
           placeholder="Enter email"
@@ -72,10 +125,45 @@ function App() {
 
         <br /><br />
 
-        <button type="submit">
+        <button
+          type="button"
+          onClick={handleSignup}>
+          Signup
+        </button>
+
+        <button
+          type="button"
+          onClick={handleLogin}>
           Login
+
+        </button>
+
+        <button
+          type="button"
+          onClick={getProfile}>
+          Get Profile
         </button>
       </form>
+
+      {profile && (
+
+        <div>
+
+          <h3>Profile Data</h3>
+
+          <p>
+            Email:
+            {profile.user.email}
+          </p>
+
+          <p>
+            User ID:
+            {profile.user.userId}
+          </p>
+
+        </div>
+
+      )}
 
       <h2>{message}</h2>
 

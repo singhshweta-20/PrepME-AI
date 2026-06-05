@@ -2,8 +2,10 @@
 // Meaning: actual backend operations.
 
 const User = require("../models/User")
+const Note = require("../models/Note")
 const bcrypt = require("bcrypt")
 const jwt = require("jsonwebtoken")
+
 
 const signupUser = async (req, res) => {
 
@@ -115,8 +117,70 @@ const getProfile =
 
 }
 
+const createNote =
+  async (req, res) => {
+
+    try {
+
+      const note =
+        new Note({
+
+          title: req.body.title,
+
+          user:
+            req.user.userId
+
+        })
+
+      await note.save()
+
+      res.json({
+        message:
+          "Note created",
+        note
+      })
+
+    } catch (error) {
+
+      res.status(500).json({
+        message:
+          "Server error"
+      })
+
+    }
+
+}
+
+const getNotes =
+  async (req, res) => {
+
+    try {
+
+      const notes =
+        await Note.find({
+
+          user:
+            req.user.userId
+
+        })
+
+      res.json(notes)
+
+    } catch (error) {
+
+      res.status(500).json({
+        message:
+          "Server error"
+      })
+
+    }
+
+}
+
 module.exports = {
   signupUser,
   loginUser,
-  getProfile
+  getProfile,
+  createNote,
+  getNotes
 }

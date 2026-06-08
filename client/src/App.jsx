@@ -4,6 +4,7 @@ import axios from "axios"
 function App() {
   const [message, setMessage] = useState("")
 
+
   // useEffect(() => {
   //   axios
   //     .get("http://localhost:5000/api/message")
@@ -20,6 +21,9 @@ function App() {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [profile, setProfile] = useState(null)
+
+  const [title, setTitle] = useState("")
+  const [notes, setNotes] = useState([])
 
   async function handleSignup(event) {
     event.preventDefault()
@@ -95,6 +99,73 @@ function App() {
     }
   }
 
+  async function createNote() {
+
+    try {
+
+      const token =
+        localStorage.getItem("token")
+
+      await axios.post(
+
+        "http://localhost:5000/api/users/notes",
+
+        {
+          title
+        },
+
+        {
+          headers: {
+            Authorization: token
+          }
+        }
+
+      )
+
+      setTitle("")
+
+      // getNotes()
+
+    } catch (error) {
+
+      console.log(error.response.data.message)
+      setMessage(error.response.data.message)
+
+    }
+
+  }
+
+  async function getNotes() {
+
+    try {
+
+      const token =
+        localStorage.getItem("token")
+
+      const response =
+        await axios.get(
+
+          "http://localhost:5000/api/users/notes",
+
+          {
+            headers: {
+              Authorization: token
+            }
+          }
+
+        )
+
+      setNotes(response.data)
+
+    } catch (error) {
+
+      console.log(error)
+      setMessage(error.response.data.message)
+
+    }
+
+  }
+
   return (
     // <div>
     //   <h1>Frontend + Backend Connection</h1>
@@ -164,6 +235,49 @@ function App() {
         </div>
 
       )}
+
+      
+
+      <hr />
+
+      <h2>Create Note</h2>
+
+      <input
+        type="text"
+        placeholder="Enter note title"
+        value={title}
+        onChange={(e) =>
+          setTitle(e.target.value)
+        }
+      />
+
+      <button
+        type="button"
+        onClick={createNote}
+      >
+        Create Note
+      </button>
+
+      <button
+        type="button"
+        onClick={getNotes}
+      >
+        Get Notes
+      </button>
+
+      <h2>My Notes</h2>
+
+      {
+        notes.map((note) => (
+
+          <div key={note._id}>
+
+            <p>{note.title}</p>
+
+          </div>
+
+        ))
+      }
 
       <h2>{message}</h2>
 

@@ -177,10 +177,121 @@ const getNotes =
 
 }
 
+const deleteNote =
+  async (req, res) => {
+
+    try {
+
+      const note =
+        await Note.findById(
+          req.params.id
+        )
+
+      if (!note) {
+
+        return res.status(404).json({
+          message: "Note not found"
+        })
+
+      }
+
+      if (
+        note.user.toString()
+        !==
+        req.user.userId
+      ) {
+
+        return res.status(403).json({
+          message: "Not authorized"
+        })
+
+      }
+
+      await Note.findByIdAndDelete(
+        req.params.id
+      )
+
+      res.json({
+        message:
+          "Note deleted"
+      })
+
+    } catch (error) {
+
+      res.status(500).json({
+        message:
+          "Server error"
+      })
+
+    }
+
+}
+
+const updateNote =
+  async (req, res) => {
+
+    try {
+
+      const note =
+        await Note.findById(
+          req.params.id
+        )
+
+      if (!note) {
+
+        return res.status(404).json({
+          message: "Note not found"
+        })
+
+      }
+
+      if (
+        note.user.toString()
+        !==
+        req.user.userId
+      ) {
+
+        return res.status(403).json({
+          message: "Not authorized"
+        })
+
+      }
+
+      const updatedNote =
+        await Note.findByIdAndUpdate(
+
+          req.params.id,
+
+          {
+            title: req.body.title
+          },
+
+          {
+            new: true
+          }
+
+        )
+
+      res.json(updatedNote)
+
+    } catch (error) {
+
+      console.log(error)
+      
+      res.status(500).json({
+        message: "Server error"
+      })
+
+    }
+
+}
+
 module.exports = {
   signupUser,
   loginUser,
   getProfile,
   createNote,
-  getNotes
+  getNotes,
+  deleteNote,
+  updateNote
 }

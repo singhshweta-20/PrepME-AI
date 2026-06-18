@@ -24,6 +24,7 @@ function App() {
 
   const [title, setTitle] = useState("")
   const [notes, setNotes] = useState([])
+  const [editId, setEditId] = useState(null)
 
   async function handleSignup(event) {
     event.preventDefault()
@@ -66,11 +67,31 @@ function App() {
 
       setMessage(response.data.message)
 
+      await getProfile()
+      await getNotes()
+
 
     } catch (error) {
       console.log(error.response.data.message)
       setMessage(error.response.data.message)
     }
+  }
+
+  async function handleLogout(event) {
+    localStorage.removeItem("token")
+    setProfile(null)
+    setNotes([])
+
+    setMessage("User Logged out sucessfully")
+  }
+
+  function handleEdit(note) {
+
+    console.log(note)
+    setTitle(note.title)
+    setEditId(note._id)
+
+    console.log(editId)
   }
 
   async function getProfile() {
@@ -166,6 +187,62 @@ function App() {
 
   }
 
+  async function deleteNotes(id) {
+
+    try {
+      const token = localStorage.getItem("token")
+
+      await axios.delete(`http://localhost:5000/api/users/notes/${id}`,
+
+        {
+          headers: {
+            Authorization: token
+          }
+        }
+      )
+      getNotes()
+
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
+  async function updateNotes() {
+    try {
+      const token = localStorage.getItem("token")
+
+      await axios.put(`http://localhost:5000/api/users/notes/${editId}`,
+        {
+          title
+        },
+
+        {
+          headers: {
+          Authorization: token
+        }
+      }
+      )
+
+      setTitle("")
+      setEditId(null)
+
+      getNotes()
+    }
+    catch (error) {
+      console.log(error)
+    }
+  }
+
+  // useEffect(() =>{
+  //   const token = localStorage.getItem("token")
+
+  //   if (token) {
+  //     getProfile()
+  //     getNotes()
+  //   }
+
+  // }, [])
+
   return (
     // <div>
     //   <h1>Frontend + Backend Connection</h1>
@@ -211,6 +288,13 @@ function App() {
 
         <button
           type="button"
+          onClick={handleLogout}>
+          Logout
+
+        </button>
+
+        <button
+          type="button"
           onClick={getProfile}>
           Get Profile
         </button>
@@ -236,7 +320,7 @@ function App() {
 
       )}
 
-      
+
 
       <hr />
 
@@ -251,12 +335,23 @@ function App() {
         }
       />
 
-      <button
-        type="button"
-        onClick={createNote}
-      >
-        Create Note
-      </button>
+      {
+        editId? (
+            <button
+              type="button"
+              onClick={updateNotes}
+              >
+                Update Note
+              </button>
+        ) : (
+          <button
+            type="button"
+            onClick={createNote}
+            >
+              Create Note
+            </button>
+        )
+      }
 
       <button
         type="button"
@@ -273,6 +368,23 @@ function App() {
           <div key={note._id}>
 
             <p>{note.title}</p>
+
+            <button
+              type="button"
+              onClick={() =>
+                deleteNotes(note._id)
+              }
+            >
+              Delete
+            </button>
+
+            <button
+            type="button"
+            onClick={ () =>
+              handleEdit(note)
+            }>
+              Edit
+            </button>
 
           </div>
 
